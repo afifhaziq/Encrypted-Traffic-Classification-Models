@@ -9,12 +9,12 @@ class Config(object):
 
     def __init__(self, dataset):
         self.model_name = 'datanet'
-        self.train_path = dataset + '/data/train.txt'                                
-        self.dev_path = dataset + '/data/dev.txt'                                    
-        self.test_path = dataset + '/data/test.txt'                                  
+        self.train_path = dataset + '\\data\\train.txt'                                
+        self.dev_path = dataset + '\\data\\dev.txt'                                    
+        self.test_path = dataset + '\\data\\test.txt'                                  
         self.class_list = [x.strip() for x in open(
-            dataset + '/data/class.txt', encoding='utf-8').readlines()]                        
-        self.save_path = dataset + '/saved_dict/' + self.model_name + '.ckpt'        
+            dataset + '\\data\\class.txt', encoding='utf-8').readlines()]                        
+        self.save_path = dataset + '\\saved_dict\\' + self.model_name + '.ckpt'        
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')   
         self.learning_rate = 0.01                                           
         self.num_classes = len(self.class_list)                         
@@ -40,4 +40,4 @@ class Model(nn.Module):
         x = F.relu(x)
 
         x = self.out(x)
-        return 
+        return x

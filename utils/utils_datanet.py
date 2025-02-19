@@ -63,7 +63,7 @@ class DatasetIterater(object):
     def _to_tensor(self, datas):
         x = torch.FloatTensor([_[0] for _ in datas]).to(self.device)
         y = torch.LongTensor([_[1] for _ in datas]).to(self.device)
-      
+        #print("Original x shape:", x.shape)
         x = torch.reshape(x,(x.shape[0],1480))
         return x,y
         
@@ -99,7 +99,6 @@ def build_iterator(dataset, config):
 
 
 def get_time_dif(start_time):
-    """获取已使用时间"""
     end_time = time.time()
     time_dif = end_time - start_time
     return timedelta(seconds=int(round(time_dif)))

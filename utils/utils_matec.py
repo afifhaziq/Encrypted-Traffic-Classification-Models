@@ -18,6 +18,7 @@ def build_dataset(config):
     
     def load_dataset(path):
         contents = []
+        buffer = []
         with open(path, 'r', encoding='UTF-8') as f:
             for line in tqdm(f):
                 token_matec = []
@@ -27,6 +28,17 @@ def build_dataset(config):
                 content, label = lin.split('\t')
 
                 token = tokenizer(content)
+                #print(len(token))
+                
+                # token = [float(j) for j in token]  # Convert tokens to float
+                
+                # buffer.append((token, int(label)))  # Add to buffer
+                
+                # # Append to contents every 3 lines
+                # if len(buffer) == 3:
+                #     contents.append(buffer, int(label)) # Append a group of 3
+                #     buffer = []  # Reset buffer
+                
                 if len(token) == 786*3:
                     token = [float(j) for j in token]
                     #p1 = token[:786]
@@ -47,8 +59,10 @@ class DatasetIterater(object):
     def __init__(self, batches, batch_size, device):
         self.batch_size = batch_size
         self.batches = batches
+
         self.n_batches = len(batches) // batch_size
         self.residue = False  # 记录batch数量是否为整数
+        
         if len(batches) % self.n_batches != 0:
             self.residue = True
         self.index = 0

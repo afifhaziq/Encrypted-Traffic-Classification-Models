@@ -6,10 +6,10 @@ from train_eval import train, init_network,test
 
 from importlib import import_module
 import argparse
-from memory_profiler import profile
+#from memory_profiler import profile
 
 parser = argparse.ArgumentParser(description='Encrypted Traffic Classification')
-parser.add_argument('--model', type=str, required=True, help='choose a model: TSCRNN, deeppacket, BiLSTM_Att, datanet')
+#parser.add_argument('--model', type=str, required=True, help='choose a model: TSCRNN, deeppacket, BiLSTM_Att, datanet')
 parser.add_argument('--data', type=str, required=True, help='input dataset source')
 #parser.add_argument('--test',  type=bool,default=False, required=True, help='True for Testing')
 parser.add_argument('--test', type=int, default=0, help='Train or test')
@@ -24,18 +24,22 @@ def get_parameter_number(net):
 
 def main():
 
-    dataset = args.data
-    model_name = args.model  
-    if 'deeppacket' in model_name:
-        from utils.utils_deeppacket import build_dataset, build_iterator, get_time_dif
-    elif "BiLSTM" in model_name:
-        from utils.utils_bilstm import build_dataset, build_iterator, get_time_dif
-    elif "TSCRNN" in model_name:
-        from utils.utils_tscrnn import build_dataset, build_iterator, get_time_dif
-    elif "datanet" in model_name:
-        from utils.utils_datanet import build_dataset, build_iterator, get_time_dif
-    elif "MATEC" in model_name:
-        from utils.utils_matec import build_dataset, build_iterator, get_time_dif
+    #dataset = "C:\\Users\\afif\\Documents\\Master\\Code\\benchmark_ntc\\Encrypted-Traffic-Classification-Models\\data\\ISCXVPN2016"
+    dataset = "C:\\Users\\afif\\Documents\\Master\\Code\\benchmark_ntc\\Encrypted-Traffic-Classification-Models\\data\\" + args.data
+    
+    model_name = "Datanet"  
+    from utils.utils_datanet import build_dataset, build_iterator, get_time_dif
+    #model_name = args.model  
+    # if 'deeppacket' in model_name:
+    #     from utils.utils_deeppacket import build_dataset, build_iterator, get_time_dif
+    # elif "BiLSTM" in model_name:
+    #     from utils.utils_bilstm import build_dataset, build_iterator, get_time_dif
+    # elif "TSCRNN" in model_name:
+    #     from utils.utils_tscrnn import build_dataset, build_iterator, get_time_dif
+    # elif "Datanet" in model_name:
+    #     from utils.utils_datanet import build_dataset, build_iterator, get_time_dif
+    # elif "MATEC" in model_name:
+    #     from utils.utils_matec import build_dataset, build_iterator, get_time_dif
         
     x = import_module('models.' + model_name)
 
@@ -48,7 +52,7 @@ def main():
     start_time = time.time()
     print("Loading data...")
     train_data, dev_data, test_data = build_dataset(config)
-    
+    print(len(train_data))
     train_iter = build_iterator(train_data, config)
     
     dev_iter = build_iterator(dev_data, config)
@@ -65,6 +69,8 @@ def main():
         print(args.test)
         print(model.parameters)
         print(get_parameter_number(model))
+        #print('train iter:', train_iter)
+        #print('train iter type:', type(train_iter))
         train(config, model, train_iter, dev_iter, test_iter)
     else:
         print(get_parameter_number(model))

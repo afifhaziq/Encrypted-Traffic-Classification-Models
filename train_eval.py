@@ -5,9 +5,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from sklearn import metrics
 import time
-from utils import get_time_dif
+from utils.utils_datanet import get_time_dif
 import wandb
-from memory_profiler import profile
+#from memory_profiler import profile
 
 def init_network(model, method='xavier', exclude='embedding', seed=123):
     for name, w in model.named_parameters():
@@ -27,8 +27,8 @@ def init_network(model, method='xavier', exclude='embedding', seed=123):
 
         
 def train(config, model, train_iter, dev_iter, test_iter):
-
-    wandb.init(project=config.model_name+"-"+config.train_path.split("/")[-3])
+    print(config.train_path.split("\\")[-2])
+    wandb.init(project=config.model_name+"-"+config.train_path.split("\\")[-3])
     wandb.config = {
     "learning_rate": config.learning_rate,
     "epochs": config.num_epochs,
@@ -51,7 +51,8 @@ def train(config, model, train_iter, dev_iter, test_iter):
         
         for i,(traffic, labels) in enumerate(train_iter): 
             
-            preds,_ = model(traffic)
+            #print(model(traffic).shape)
+            preds = model(traffic)
             loss = F.cross_entropy(preds, labels)
             #loss = Loss(preds,labels)
            
@@ -75,8 +76,7 @@ def train(config, model, train_iter, dev_iter, test_iter):
                     improve = ''
                 wandb.log({"train_loss":  loss.item()})
                 wandb.log({"train_acc":  train_acc})
-                #wandb.log({"dev_loss":  dev_loss})
-                #wandb.log({"dev_acc":  dev_acc})
+                
                 model.train()
                 wandb.watch(model)
                 
@@ -111,7 +111,7 @@ def test(config, model, test_iter):
     print("Confusion Matrix...")
     print(test_confusion)
     time_dif = get_time_dif(start_time)
-    #print("Time usage:", time_dif)
+    print("Time usage:", time_dif)
 
 
 def evaluate(config, model, data_iter, test=False):
@@ -124,7 +124,7 @@ def evaluate(config, model, data_iter, test=False):
     with torch.no_grad():
         for traffic,labels in data_iter:
             
-            outputs,_ = model(traffic)
+            outputs = model(traffic)
             loss = F.cross_entropy(outputs, labels)
             loss_total += loss
             labels = labels.data.cpu().numpy()
