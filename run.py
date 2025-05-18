@@ -3,7 +3,7 @@ import time
 import torch
 import numpy as np
 from train_eval import train, init_network,test
-
+import wandb
 from importlib import import_module
 import argparse
 #from memory_profiler import profile
@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(description='Encrypted Traffic Classification')
 #parser.add_argument('--model', type=str, required=True, help='choose a model: TSCRNN, deeppacket, BiLSTM_Att, datanet')
 parser.add_argument('--data', type=str, required=True, help='input dataset source')
 #parser.add_argument('--test',  type=bool,default=False, required=True, help='True for Testing')
-parser.add_argument('--test', type=int, default=0, help='Train or test')
+parser.add_argument('--test', type=bool, default=False, help='Train or test')
 
 args = parser.parse_args()
 
@@ -58,23 +58,22 @@ def main():
     dev_iter = build_iterator(dev_data, config)
     test_iter = build_iterator(test_data, config)
     
-    time_dif = get_time_dif(start_time)
-    print("Time usage:", time_dif)
+    pre_time_dif, average_pre_time = get_time_dif(start_time, test=0, data=args.data)
+    print(f"Preprocess Time : {pre_time_dif:.10f} seconds")  # Show 6 decimal places
+    print(f"Average prepocess time : {average_pre_time:.10f} seconds")
 
     
     model = x.Model(config).to(config.device)
     #init_network(model)
     
-    if args.test == 1:
+    if args.test == False:
         print(args.test)
         print(model.parameters)
-        print(get_parameter_number(model))
-        #print('train iter:', train_iter)
-        #print('train iter type:', type(train_iter))
-        train(config, model, train_iter, dev_iter, test_iter)
+        train(config, model, train_iter, dev_iter, test_iter, args.data)
     else:
-        print(get_parameter_number(model))
-        test(config,model,test_iter)
+        test(config, model, test_iter, data=args.data)
+        wandb.log({"preprocess_time":  float(pre_time_dif)})
+        wandb.log({"averagepreprocess_time":  float(average_pre_time)})
     
 if __name__ == '__main__':
     main()
